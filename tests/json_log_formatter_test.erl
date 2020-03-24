@@ -8,19 +8,46 @@ application_progress_test() ->
     Log = log_with_report(Report),
 
     BinaryMessage = json_log_formatter:format(Log, []),
-    Data = jsx:decode(BinaryMessage, [return_maps]),
 
-    assert_path_has_value(Data, [<<"label">>], <<"application_controller">>),
-    assert_path_has_value(Data, [<<"application">>], <<"sasl">>),
-    assert_path_has_value(Data, [<<"state">>], <<"progress">>),
+    Data = jsx:decode(BinaryMessage, [return_maps]),
+    assert_path_has_value(Data, [<<"label">>, <<"application_controller">>], <<"progress">>),
+    assert_path_has_value(Data, [<<"report">>, <<"application">>], <<"sasl">>),
 
     ok.
 
+supervisor_progress_test() ->
+    Report = #{label => {supervisor,progress},
+               report => [
+                 {supervisor,{local,sasl_safe_sup}},
+                 {started,[
+                    {pid, <<"pid">>},
+                    {id,alarm_handler_a},
+                    {mfargs,
+                        {alarm_handler_b,start_link,[]}},
+                    {restart_type,permanent},
+                    {shutdown,2000},
+                    {child_type,worker}]}
+    ]},
 
-assert_path_has_value(Data, [Key], Value) ->
+    Log = log_with_report(Report),
+
+    BinaryMessage = json_log_formatter:format(Log, []),
+    Data = jsx:decode(BinaryMessage, [return_maps]),
+
+    assert_path_has_value(Data, [<<"label">>, <<"supervisor">>], <<"progress">>),
+    assert_path_has_value(Data, [<<"report">>, <<"started">>, <<"child_type">>], <<"worker">>),
+    assert_path_has_value(Data, [<<"report">>, <<"started">>, <<"id">>], <<"alarm_handler_a">>),
+    assert_path_has_value(Data, [<<"report">>, <<"started">>, <<"mfargs">>],
+        [<<"alarm_handler_b">>,<<"start_link">>,[]]),
+
+    ok.
+
+assert_path_has_value(Data, [], Value) ->
+    ?assertEqual(Data, Value);
+assert_path_has_value(Data, [Key|Rest], Value) ->
     ?assert(maps:is_key(Key, Data)),
-    ?assertEqual(Value, maps:get(Key, Data)).
-
+    NewData = maps:get(Key, Data),
+    assert_path_has_value(NewData, Rest, Value).
 
 log_with_report(Report) ->
     #{level => test,
