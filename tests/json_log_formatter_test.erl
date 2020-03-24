@@ -7,7 +7,7 @@ application_progress_test() ->
 
     Log = log_with_msg_report(Report),
 
-    BinaryMessage = json_log_formatter:format(Log, []),
+    BinaryMessage = json_log_formatter:format(Log, #{}),
 
     Data = jsx:decode(BinaryMessage, [return_maps]),
     assert_path_has_value(Data, [<<"label">>, <<"application_controller">>], <<"progress">>),
@@ -31,7 +31,7 @@ supervisor_progress_test() ->
 
     Log = log_with_msg_report(Report),
 
-    BinaryMessage = json_log_formatter:format(Log, []),
+    BinaryMessage = json_log_formatter:format(Log, #{}),
     Data = jsx:decode(BinaryMessage, [return_maps]),
 
     assert_path_has_value(Data, [<<"label">>, <<"supervisor">>], <<"progress">>),
@@ -48,7 +48,7 @@ log_macro_test() ->
     Report = {report,#{what => Msg}},
     Log = log_with_report(Report),
 
-    BinaryMessage = json_log_formatter:format(Log, []),
+    BinaryMessage = json_log_formatter:format(Log, #{}),
     Data = jsx:decode(BinaryMessage, [return_maps]),
 
     % ?assertEqual(#{}, Data),

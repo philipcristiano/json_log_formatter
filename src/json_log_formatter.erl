@@ -5,9 +5,13 @@
 
 format(#{level:=_Level,
        msg:={report, ReportMap},
-       meta:=_Meta}, _FConfig) when is_map(ReportMap) ->
+       meta:=_Meta}, FConfig) when is_map(ReportMap) ->
     TermMap = termify_map(ReportMap),
-    jsx:encode(TermMap).
+    Opts = case maps:get(pretty_print, FConfig, false) of
+        true -> [space, indent];
+        false -> []
+    end,
+    jsx:encode(TermMap, Opts).
 
 termify_map(Map) when is_map(Map) ->
     maps:fold(fun encode_map/3, #{}, Map).
