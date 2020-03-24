@@ -15,10 +15,12 @@ termify_map(Map) when is_map(Map) ->
 encode_map(K, V, AccIn) when is_map(V) ->
     ValueMap = termify_map(V),
     maps:put(K, ValueMap, AccIn);
-encode_map(K, V, AccIn) when is_list(V) ->
+encode_map(K, V=[{_A, _B}|_T], AccIn) when is_list(V) ->
     Map = maps:from_list(V),
     ValueMap = termify_map(Map),
     maps:put(K, ValueMap, AccIn);
+encode_map(K, V, AccIn) when is_list(V) ->
+    maps:put(K, V, AccIn);
 encode_map(K, {A, B, C}, AccIn) ->
     % This triplet can cause problems in jsx:is_term/1
     % as it sometimes gets parsed as a date/time
