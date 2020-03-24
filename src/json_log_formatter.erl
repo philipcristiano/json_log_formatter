@@ -42,7 +42,5 @@ encode_non_term(L) when is_list(L) ->
     termify_map(M);
 encode_non_term(P) when is_pid(P) ->
     binary:list_to_bin(pid_to_list(P));
-encode_non_term({A, B, C}) ->
-    [A, B, C];
-encode_non_term({A, B}) ->
-    #{A => B}.
+encode_non_term(T) when is_tuple(T)->
+    erlang:tuple_to_list(T).

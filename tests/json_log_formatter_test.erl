@@ -10,7 +10,7 @@ application_progress_test() ->
     BinaryMessage = json_log_formatter:format(Log, #{}),
 
     Data = jsx:decode(BinaryMessage, [return_maps]),
-    assert_path_has_value(Data, [<<"label">>, <<"application_controller">>], <<"progress">>),
+    assert_path_has_value(Data, [<<"label">>], [<<"application_controller">>, <<"progress">>]),
     assert_path_has_value(Data, [<<"report">>, <<"application">>], <<"sasl">>),
 
     ok.
@@ -34,7 +34,7 @@ supervisor_progress_test() ->
     BinaryMessage = json_log_formatter:format(Log, #{}),
     Data = jsx:decode(BinaryMessage, [return_maps]),
 
-    assert_path_has_value(Data, [<<"label">>, <<"supervisor">>], <<"progress">>),
+    assert_path_has_value(Data, [<<"label">>], [<<"supervisor">>, <<"progress">>]),
     assert_path_has_value(Data, [<<"report">>, <<"started">>, <<"pid">>], <<"<0.85.0>">>),
     assert_path_has_value(Data, [<<"report">>, <<"started">>, <<"child_type">>], <<"worker">>),
     assert_path_has_value(Data, [<<"report">>, <<"started">>, <<"id">>], <<"alarm_handler_a">>),
